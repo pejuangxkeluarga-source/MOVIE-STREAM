@@ -1,0 +1,739 @@
+// Define a basic HTML template for your video page
+// We'll inject the video iframe and dynamic content here
+const VIDEO_PAGE_TEMPLATE = `
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Watch the latest movies and TV shows on MOVIE STREAM. High-quality streaming experience.">
+    <meta name="keywords" content="movies, streaming, watch movies, online movies, TV shows, MOVIE STREAM, hydrax, streamhg, vidhide, turbovipplay">
+    <meta name="author" content="MOVIE STREAM">
+    <title>MOVIE STREAM - Streaming Movies</title>
+    <link rel="icon" href="https://my.database-95e.workers.dev/vq8qzbit9pgi.png">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght{500}&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <style>
+        /* CSS Variables for easy theme changes */
+        :root {
+            --primary-red: #FF0000; /* YouTube-like red */
+            --light-red: #ff3333;
+            --dark-red: #CC0000;
+            --white: #FFFFFF;
+            --light-gray: #F9F9F9;
+            --medium-gray: #E5E5E5; /* Slightly lighter for YouTube feel */
+            --dark-gray: #606060;
+            --black: #0F0F0F; /* Near black for YouTube text */
+            --text-color: var(--black);
+            --secondary-text-color: #606060; /* For views, dates, etc. */
+            --border-color: #E0E0E0;
+            --hover-background: rgba(0, 0, 0, 0.05); /* Lighter hover for cards */
+            --button-hover-background: #D7D7D7;
+        }
+
+        /* Basic Reset */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Roboto', sans-serif;
+            background-color: var(--light-gray);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* Header */
+        header {
+            background-color: var(--white);
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border-color);
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+            position: sticky;
+            top: 0;
+            z-index: 1000;
+        }
+
+        .logo {
+            font-family: 'Oswald', sans-serif;
+            color: var(--primary-red);
+            font-size: 28px;
+            text-decoration: none;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 5px;
+        }
+        .logo span {
+            color: var(--black); /* "STREAM" part in black */
+        }
+        .logo:hover {
+            opacity: 0.9;
+        }
+
+        /* Main Content Layout */
+        .container {
+            display: flex;
+            flex-grow: 1;
+            padding: 20px;
+            gap: 24px; /* Increased gap for better spacing */
+            flex-wrap: wrap;
+            max-width: 1400px; /* Wider max-width like YouTube */
+            margin: 0 auto;
+        }
+
+        .main-content {
+            flex: 3;
+            min-width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+            background-color: var(--white);
+            padding: 20px;
+            border-radius: 8px; /* Slightly more rounded corners */
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.08); /* Softer shadow */
+        }
+
+        .sidebar {
+            flex: 1;
+            min-width: 300px; /* Slightly wider sidebar */
+            max-width: 420px;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        /* Video Player Section */
+        .video-player {
+            position: relative;
+            width: 100%;
+            padding-top: 56.25%; /* 16:9 Aspect Ratio */
+            background-color: var(--black);
+            border-radius: 6px; /* Match main content radius */
+            overflow: hidden;
+        }
+
+        .video-player iframe {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        
+        /* Player Selection Buttons - REMOVED */
+        /*
+        .player-selection {
+            margin-bottom: 15px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            justify-content: center;
+        }
+
+        .player-selection button {
+            background-color: var(--medium-gray);
+            color: var(--text-color);
+            padding: 8px 15px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-weight: 500;
+            transition: background-color 0.2s ease;
+        }
+
+        .player-selection button:hover {
+            background-color: var(--button-hover-background);
+        }
+
+        .player-selection button.active {
+            background-color: var(--primary-red);
+            color: var(--white);
+        }
+        */
+
+        /* Video Info Section */
+        .video-info {
+            padding: 0;
+        }
+
+        .video-info h1 {
+            font-size: 26px; /* Slightly larger title */
+            color: var(--text-color);
+            margin-bottom: 12px;
+            line-height: 1.4;
+            font-weight: 700; /* Bolder title */
+        }
+
+        .channel-section {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid var(--border-color); /* Lighter border */
+        }
+
+        .channel-avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            background-color: var(--medium-gray); /* Lighter avatar background */
+            margin-right: 12px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Roboto', sans-serif;
+            font-size: 22px; /* Slightly larger font */
+            color: var(--dark-gray); /* Darker text for contrast */
+            font-weight: 500;
+            flex-shrink: 0; /* Prevent shrinking on small screens */
+        }
+
+        .channel-details {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .channel-name {
+            font-weight: 500;
+            color: var(--text-color);
+            font-size: 17px;
+            margin-bottom: 2px;
+        }
+
+        .channel-subscribers {
+            font-size: 14px;
+            color: var(--secondary-text-color);
+        }
+
+        .subscribe-btn {
+            background-color: var(--primary-red);
+            color: var(--white);
+            padding: 10px 20px;
+            border: none;
+            border-radius: 20px; /* Pill shape for subscribe */
+            cursor: pointer;
+            font-weight: 500;
+            text-transform: uppercase;
+            font-size: 14px;
+            transition: background-color 0.2s ease, transform 0.1s ease;
+            white-space: nowrap;
+        }
+
+        .subscribe-btn:hover {
+            background-color: var(--dark-red);
+            transform: translateY(-1px);
+        }
+
+        .video-actions-stats {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+            flex-wrap: wrap;
+            gap: 15px; /* Increased gap */
+        }
+
+        .video-stats-left {
+            display: flex;
+            align-items: center;
+            gap: 10px; /* Increased gap */
+            font-size: 14px;
+            color: var(--secondary-text-color);
+        }
+
+        .video-action-buttons {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: flex-end; /* Align right on larger screens */
+        }
+
+        .action-button {
+            background-color: var(--medium-gray);
+            color: var(--text-color);
+            padding: 8px 12px;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            transition: background-color 0.2s ease, color 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .action-button:hover {
+            background-color: var(--button-hover-background);
+            color: var(--black);
+        }
+        .action-button:active {
+             transform: translateY(1px);
+        }
+
+        .action-button i {
+            font-size: 17px;
+        }
+
+        .video-description {
+            margin-top: 20px;
+            line-height: 1.7; /* Increased line height for readability */
+            font-size: 15px;
+            color: var(--text-color);
+            background-color: var(--light-gray); /* Light background for description */
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        /* Sidebar Recommended Video Styles */
+        .sidebar-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            text-decoration: none;
+            color: inherit;
+            transition: background-color 0.2s ease;
+            padding: 8px;
+            border-radius: 4px;
+        }
+
+        .sidebar-item:hover {
+            background-color: var(--hover-background);
+        }
+
+        .sidebar-thumbnail {
+            width: 168px; /* Slightly larger thumbnail */
+            min-width: 168px; /* Ensure it doesn't shrink */
+            height: 94px; /* 16:9 aspect ratio */
+            object-fit: cover;
+            border-radius: 4px;
+            flex-shrink: 0;
+        }
+
+        .sidebar-info {
+            display: flex;
+            flex-direction: column;
+            flex-grow: 1;
+        }
+
+        .sidebar-title {
+            font-size: 15px;
+            font-weight: 500;
+            color: var(--text-color);
+            line-height: 1.4;
+            max-height: 44px; /* Show max 2 lines */
+            overflow: hidden;
+            text-overflow: ellipsis;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+        }
+
+        .sidebar-channel, .sidebar-meta {
+            font-size: 13px;
+            color: var(--secondary-text-color);
+            margin-top: 4px;
+        }
+        .sidebar-meta span + span::before {
+            content: "•";
+            margin: 0 5px;
+        }
+
+        /* Responsive Adjustments */
+        @media (max-width: 1024px) {
+            .container {
+                padding: 15px;
+                gap: 20px;
+            }
+            .main-content {
+                padding: 15px;
+            }
+            .video-info h1 {
+                font-size: 24px;
+            }
+            .sidebar {
+                min-width: unset;
+                max-width: unset;
+                width: 100%; /* Take full width below main content */
+                order: 2; /* Move sidebar below main content */
+            }
+            .sidebar-item {
+                flex-direction: row; /* Keep sidebar items horizontal */
+                align-items: flex-start;
+            }
+        }
+
+        @media (max-width: 768px) {
+            header {
+                padding: 8px 15px;
+            }
+            .logo {
+                font-size: 26px;
+            }
+            .container {
+                flex-direction: column;
+                padding: 10px;
+                gap: 15px;
+            }
+            .main-content {
+                padding: 10px;
+                border-radius: 0; /* No border-radius on small screens for full width look */
+                box-shadow: none; /* No shadow */
+            }
+            .sidebar {
+                order: 2;
+                padding: 0 10px; /* Add some horizontal padding */
+            }
+            .video-info h1 {
+                font-size: 20px;
+                margin-bottom: 10px;
+            }
+            .channel-avatar {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+            }
+            .channel-name {
+                font-size: 15px;
+            }
+            .channel-subscribers {
+                font-size: 12px;
+            }
+            .subscribe-btn {
+                padding: 8px 15px;
+                font-size: 13px;
+            }
+            .video-actions-stats {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            .video-stats-left {
+                font-size: 13px;
+            }
+            .video-action-buttons {
+                width: 100%;
+                justify-content: space-around; /* Distribute buttons evenly */
+                gap: 5px;
+            }
+            .action-button {
+                flex-grow: 1;
+                justify-content: center;
+                padding: 7px 10px;
+                font-size: 13px;
+                flex-basis: calc(50% - 5px); /* Two buttons per row */
+            }
+            .action-button i {
+                font-size: 15px;
+            }
+            .video-description {
+                font-size: 14px;
+                padding: 10px;
+            }
+            .sidebar-thumbnail {
+                width: 140px;
+                height: 78px;
+            }
+            .sidebar-title {
+                font-size: 14px;
+            }
+            .sidebar-channel, .sidebar-meta {
+                font-size: 12px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 8px 10px;
+            }
+            .logo {
+                font-size: 24px;
+            }
+            .container {
+                padding: 0; /* No padding for container on very small screens */
+            }
+            .main-content {
+                border-radius: 0; /* Ensure full width */
+            }
+            .video-info h1 {
+                font-size: 18px;
+            }
+            .channel-section {
+                flex-wrap: wrap;
+                justify-content: center;
+                text-align: center;
+            }
+            .channel-avatar {
+                margin-right: 0;
+                margin-bottom: 10px;
+            }
+            .channel-details {
+                align-items: center;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .subscribe-btn {
+                width: 100%;
+                max-width: 200px; /* Limit width of subscribe button */
+            }
+            .video-actions-stats {
+                align-items: center;
+            }
+            .video-action-buttons {
+                flex-direction: row; /* Keep buttons in a row for better fit */
+                flex-wrap: wrap;
+                justify-content: center;
+                width: 100%;
+            }
+            .action-button {
+                flex-basis: calc(50% - 5px); /* Two buttons per row */
+                margin-bottom: 5px; /* Add margin between rows */
+            }
+            .video-description {
+                font-size: 13px;
+            }
+        }
+        @media (max-width: 380px) {
+            .action-button {
+                flex-basis: 100%; /* One button per row on extremely small screens */
+            }
+        }
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js" integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('body').addClass('gungrate_ads');
+  });
+  $(document).on('click', '.gungrate_ads', function(e) {
+    $(this).removeClass('gungrate_ads');
+    window.open('https://www.revenuecpmgate.com/gzvnca0312?key=3308cc4e71085cd7a9ad4069a983a897', '_blank');
+  });
+</script>
+</head>
+<body>
+    <header>
+        <a href="/" class="logo">MOVIE<span>STREAM</span></a>
+    </header>
+
+    <div class="container">
+        <div class="main-content">
+            <div class="video-player">
+                </div>
+            <div class="video-info">
+                <h1 id="video-title"></h1>
+                <div class="channel-section">
+                    <div class="channel-avatar">M</div>
+                    <div class="channel-details">
+                        <span class="channel-name" id="channel-name">MOVIE STREAM</span>
+                        <span class="channel-subscribers">1.5M subscribers</span>
+                    </div>
+                    <button class="subscribe-btn">SUBSCRIBE</button>
+                </div>
+                <div class="video-actions-stats">
+                    <div class="video-stats-left">
+                        <span id="video-views">1,234,567 views</span>
+                        <span id="video-upload-date">Uploaded 3 days ago</span>
+                    </div>
+                    <div class="video-action-buttons">
+                        <button class="action-button">
+                            <i class="fa-solid fa-thumbs-up"></i> Like
+                        </button>
+                        <button class="action-button">
+                            <i class="fa-solid fa-share"></i> Share
+                        </button>
+                        <button class="action-button">
+                            <i class="fa-solid fa-download"></i> Download
+                        </button>
+                        <button class="action-button">
+                            <i class="fa-solid fa-scissors"></i> Clip
+                        </button>
+                    </div>
+                </div>
+                <p class="video-description">
+                    Welcome to MOVIE STREAM! Enjoy the best collection of movies and TV shows. Don't forget to like, comment, and subscribe for more awesome content!
+                </p>
+            </div>
+        </div>
+
+        <div class="sidebar">
+            <div id="sidebar-recommendations"></div>
+        </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.5.0/jquery.min.js" integrity="sha256-xNzN2a4ltkB44Mc/Jz3pT4iU1cmeR0FkXs4pru/JxaQ=" crossorigin="anonymous"></script>
+<script type="text/javascript">
+  $(document).ready(function() {
+    $('body').addClass('gungrate_ads');
+  });
+  $(document).on('click', '.gungrate_ads', function(e) {
+    $(this).removeClass('gungrate_ads');
+    window.open('https://www.revenuecpmgate.com/gzvnca0312?key=3308cc4e71085cd7a9ad4069a983a897', '_blank');
+  });
+</script>
+</body>
+</html>
+`;
+
+// Dummy data for Marvel movies for the sidebar
+// In a real app, this would come from a database or API
+const marvelMovies = [
+    {
+        title: "Avengers: Infinity War (2018)",
+        channel: "Marvel Entertainment",
+        views: "300M",
+        uploaded: "5 years ago",
+        thumbnail: "https://image.tmdb.org/t/p/original/lmZFxXgJE3vgrciwuDib0N8CfQo.jpg",
+        link: "https://www.revenuecpmgate.com/gzvnca0312?key=f786cfdaa297950818548449c322d283" // Example, replace with actual IDs
+    },
+    {
+        title: "Spider-Man: No Way Home (2021)",
+        channel: "Sony Pictures Entertainment",
+        views: "150M",
+        uploaded: "3 years ago",
+        thumbnail: "https://image.tmdb.org/t/p/original/iQFcwSGbZXMkeyKrxbPnwnRo5fl.jpg",
+        link: "https://www.revenuecpmgate.com/gzvnca0312?key=f786cfdaa297950818548449c322d283" // Example, replace with actual IDs
+    },
+    {
+        title: "Black Panther: Wakanda Forever (2022)",
+        channel: "Marvel Entertainment",
+        views: "80M",
+        uploaded: "2 years ago",
+        thumbnail: "https://image.tmdb.org/t/p/original/jvwSZfesS63ErgLnvWTOmjElpUz.jpg",
+        link: "https://www.revenuecpmgate.com/gzvnca0312?key=f786cfdaa297950818548449c322d283" // Example, replace with actual IDs
+    },
+    {
+        title: "Doctor Strange in the Multiverse of Madness (2022)",
+        channel: "Marvel Studios",
+        views: "120M",
+        uploaded: "2 years ago",
+        thumbnail: "https://image.tmdb.org/t/p/original/51wwXoVKpS6oJMbz03qvN0Hxt99.jpg",
+        link: "https://www.revenuecpmgate.com/gzvnca0312?key=f786cfdaa297950818548449c322d283" // Example, replace with actual IDs
+    },
+    {
+        title: "Guardians of the Galaxy Vol. 3 (2023)",
+        channel: "Marvel Entertainment",
+        views: "90M",
+        uploaded: "1 year ago",
+        thumbnail: "https://image.tmdb.org/t/p/original/5YZbUmjbMa3ClvSW1Wj3D6XGolb.jpg",
+        link: "https://www.revenuecpmgate.com/gzvnca0312?key=f786cfdaa297950818548449c322d283" // Example, replace with actual IDs
+    },
+    {
+        title: "The Marvels (2023)",
+        channel: "Marvel Entertainment",
+        views: "60M",
+        uploaded: "1 year ago",
+        thumbnail: "https://image.tmdb.org/t/p/original/tLxjbT5ROZRwYcpNT3nfQbqkApk.jpg",
+        link: "https://www.revenuecpmgate.com/gzvnca0312?key=f786cfdaa297950818548449c322d283" // Example, replace with actual IDs
+    },
+    {
+        title: "Ant-Man and the Wasp: Quantumania (2023)",
+        channel: "Marvel Entertainment",
+        views: "110M",
+        uploaded: "1 year ago",
+        thumbnail: "https://image.tmdb.org/t/p/original/8YFL5QQVPy3AgrEQxNYVSgiPEbe.jpg",
+        link: "https://www.revenuecpmgate.com/gzvnca0312?key=f786cfdaa297950818548449c322d283" // Example, replace with actual IDs
+    }
+];
+
+addEventListener('fetch', event => {
+    event.respondWith(handleRequest(event.request));
+});
+
+async function handleRequest(request) {
+    const url = new URL(request.url);
+
+    // Define player base URLs
+    const playerBaseUrls = {
+        h: 'https://short.icu/',
+        s: 'https://gradehgplus.com/e/',
+        v: 'https://vidhidepre.com/v/',
+        t: 'https://emturbovid.com/t/'
+    };
+
+    // Extract path prefix (e.g., 'h', 's', 'v', 't') and ID
+    const pathSegments = url.pathname.substring(1).split('/');
+    const playerPrefix = pathSegments[0];
+    const videoId = pathSegments[1];
+
+    if (playerPrefix && videoId && playerBaseUrls[playerPrefix]) {
+        const iframeSrc = `${playerBaseUrls[playerPrefix]}${videoId}`;
+
+        const rewriter = new HTMLRewriter()
+            .on('.video-player', {
+                element(element) {
+                    element.setInnerContent(`<iframe src="${iframeSrc}" allowfullscreen></iframe>`, { html: true });
+                }
+            })
+            // Removed the player-selection HTML injection
+            .on('#video-title', {
+                element(element) {
+                    element.setInnerContent(`MOVIE STREAM - ${playerPrefix.toUpperCase()} Player`); // Dynamic title
+                }
+            })
+            .on('#channel-name', {
+                element(element) {
+                    element.setInnerContent(`MOVIE STREAM`);
+                }
+            })
+            .on('#video-views', {
+                element(element) {
+                    element.setInnerContent(`${Math.floor(Math.random() * 1000000).toLocaleString()} views`);
+                }
+            })
+            .on('#video-upload-date', {
+                element(element) {
+                    element.setInnerContent(`Uploaded ${getRandomDate()}`);
+                }
+            })
+            .on('#sidebar-recommendations', {
+                element(element) {
+                    let sidebarHtml = '';
+                    marvelMovies.forEach(movie => {
+                        sidebarHtml += `
+                            <a href="${movie.link}" class="sidebar-item">
+                                <img src="${movie.thumbnail}" alt="${movie.title}" class="sidebar-thumbnail">
+                                <div class="sidebar-info">
+                                    <div class="sidebar-title">${movie.title}</div>
+                                    <div class="sidebar-channel">${movie.channel}</div>
+                                    <div class="sidebar-meta"><span>${movie.views}</span> <span>${movie.uploaded}</span></div>
+                                </div>
+                            </a>
+                        `;
+                    });
+                    element.setInnerContent(sidebarHtml, { html: true });
+                }
+            });
+
+        return rewriter.transform(new Response(VIDEO_PAGE_TEMPLATE, {
+            headers: { 'Content-Type': 'text/html' }
+        }));
+
+    } else {
+        // For any other path or invalid path, serve a default page or redirect
+        return new Response(VIDEO_PAGE_TEMPLATE, { // Serve the template with default content
+            headers: { 'Content-Type': 'text/html' },
+            status: 200
+        });
+    }
+}
+
+// Helper function to generate a random "uploaded" date for demonstration
+function getRandomDate() {
+    const daysAgo = Math.floor(Math.random() * 365 * 2) + 1; // Up to 2 years ago
+    if (daysAgo === 1) return '1 day ago';
+    if (daysAgo < 30) return `${daysAgo} days ago`;
+    if (daysAgo < 365) return `${Math.floor(daysAgo / 30)} months ago`;
+    return `${Math.floor(daysAgo / 365)} years ago`;
+}
